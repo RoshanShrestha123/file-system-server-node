@@ -9,9 +9,9 @@ let server = http.createServer(function(request,response){
     switch(url){
         case '/write':
             console.log("write");
-            fs.writeFile('./lf.js','this is what i write',function(err,done){
-                    if(err){
-                        response.end(err);
+            fs.writeFile('./new-name.js','this is what i write',function(error,done){
+                    if(error){
+                        response.end(error);
                     }else{
 
                         response.end(done);
@@ -21,10 +21,10 @@ let server = http.createServer(function(request,response){
             break;
         case '/read':
             console.log("read");
-            fs.readFile('./lf.js', 'UTF-8', function (err, done) {
-                if (err) {
-                     response.end('err')
-                    console.log('err')
+            fs.readFile('./new-name.js', 'UTF-8', function (error, done) {
+                if (error) {
+                     response.end(error)
+                    console.log('error')
                 } else {
                     console.log('success >>>');
                      response.end(done)
@@ -33,17 +33,33 @@ let server = http.createServer(function(request,response){
             break;
         case '/rename':
             console.log("rename");
-            fs.rename('./lf.js', 'new-name.js', function (err, done) {
-                if (err) {
-                    response.end('err');
+            fs.rename('./lf.js', 'new-name.js', function (error, done) {
+                if (error) {
+                    response.end(error);
                 } else {
                     console.log('success >>>');
-                    response.end('success')
+                    response.end(done);
                 }
             })
             break;
+        case '/unlink':
+            fs.unlink('./new-name.js',function( error,done){
+                if(error){
+                    console.log("error>>",error);
+                    response.end(error);
+                }else{
+                    console.log("sucess>>", done);
+                    response.end(done);
+                }
+            })
     }
     
     
 })
-server.listen(8080);
+server.listen(8080,function(error,done){
+    if(error){
+        console.log("server failed",error);
+    }else{
+        console.log("sucess",done);
+    }
+});
