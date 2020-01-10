@@ -1,15 +1,28 @@
 const fs  = require('fs');
 const http = require('http');
+let fileName= null;
+let urlArr = [];
+
+ function splitUrl(url){
+     if(url){
+        urlArr =url.split('/');
+     }
+    
+
+}
 
 // creating server
 let server = http.createServer(function(request,response){
     console.log("client connected");
     const url = request.url;
-    console.log("current url",url);
-    switch(url){
-        case '/write':
+    console.log("curent url", url)
+    splitUrl(url);
+    switch(urlArr[1]){
+        
+        case 'write':
             console.log("write");
-            fs.writeFile('./new-name.js','this is what i write',function(error,done){
+            
+            fs.writeFile(urlArr[2] || 'index.js',urlArr[3],function(error,done){
                     if(error){
                         response.end(error);
                     }else{
@@ -19,9 +32,9 @@ let server = http.createServer(function(request,response){
                     }
                 })
             break;
-        case '/read':
+        case 'read':
             console.log("read");
-            fs.readFile('./new-name.js', 'UTF-8', function (error, done) {
+            fs.readFile(urlArr[2], 'UTF-8', function (error, done) {
                 if (error) {
                      response.end(error)
                     console.log('error')
@@ -31,9 +44,9 @@ let server = http.createServer(function(request,response){
                 }
             })
             break;
-        case '/rename':
+        case 'rename':
             console.log("rename");
-            fs.rename('./lf.js', 'new-name.js', function (error, done) {
+            fs.rename(urlArr[2], urlArr[3], function (error, done) {
                 if (error) {
                     response.end(error);
                 } else {
@@ -42,8 +55,8 @@ let server = http.createServer(function(request,response){
                 }
             })
             break;
-        case '/unlink':
-            fs.unlink('./new-name.js',function( error,done){
+        case 'unlink':
+            fs.unlink(urlArr[2],function( error,done){
                 if(error){
                     console.log("error>>",error);
                     response.end(error);
