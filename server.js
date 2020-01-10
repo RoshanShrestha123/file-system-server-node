@@ -7,64 +7,75 @@ let urlArr = [];
      if(url){
         urlArr =url.split('/');
      }
-    
-
 }
 
+function readFile(fileName,response){
+    fs.readFile(fileName, 'UTF-8', function (error, done) {
+        if (error) {
+            response.end("Sorry, "+fileName+" cannot be read. "+ error);
+            console.log('error')
+        } else {
+            console.log('success >>>');
+             response.end(done)
+        }
+    })
+}
+
+function writeFile(fileName,contain,response){
+    fs.writeFile(fileName|| 'index.js',contain,function(error,done){
+        if(error){
+            console.log("ERROR >>>",error);
+            response.end("Sorry, data cannot be inserted."+error);
+        }else{
+            console.log("Sucess>>>",done);
+            response.end("sucessfully written in the file");
+        }
+    })
+}
+function renameFile(oldName,newName,response){
+    fs.rename(oldName, newName, function (error, done) {
+        if (error) {
+            console.log("Error >>>"+error);
+            response.end("File name "+oldName+" cannot be converted to "+newName);
+        } else {
+            console.log('success >>>');
+            response.end("File name -> "+oldName+" changed to -> "+newName);
+        }
+    })
+}
+function deleteFile(fileName,response){
+    fs.unlink(fileName,function( error,done){
+        if(error){
+            console.log("ERROR>> ",error);
+            response.end("File "+fileName+" cannot be delete, File doesnt exist."+error);
+        }else{
+            console.log("SUCCESS>>", done);
+            response.end("File "+ fileName+" sucessfully removed.");
+        }
+    })
+}
 // creating server
 let server = http.createServer(function(request,response){
     console.log("client connected");
     const url = request.url;
     console.log("curent url", url)
     splitUrl(url);
-    switch(urlArr[1]){
-        
+    switch(urlArr[1]){  
         case 'write':
-            console.log("write");
-            
-            fs.writeFile(urlArr[2] || 'index.js',urlArr[3],function(error,done){
-                    if(error){
-                        response.end(error);
-                    }else{
-
-                        response.end(done);
-
-                    }
-                })
+            writeFile(urlArr[2],urlArr[3],response);
             break;
         case 'read':
-            console.log("read");
-            fs.readFile(urlArr[2], 'UTF-8', function (error, done) {
-                if (error) {
-                     response.end(error)
-                    console.log('error')
-                } else {
-                    console.log('success >>>');
-                     response.end(done)
-                }
-            })
+            readFile(urlArr[2],response);
             break;
         case 'rename':
-            console.log("rename");
-            fs.rename(urlArr[2], urlArr[3], function (error, done) {
-                if (error) {
-                    response.end(error);
-                } else {
-                    console.log('success >>>');
-                    response.end(done);
-                }
-            })
+            renameFile(urlArr[2],urlArr[3],response);
             break;
         case 'unlink':
-            fs.unlink(urlArr[2],function( error,done){
-                if(error){
-                    console.log("error>>",error);
-                    response.end(error);
-                }else{
-                    console.log("sucess>>", done);
-                    response.end(done);
-                }
-            })
+            deleteFile(urlArr[2],response);
+            break;
+        default:
+            console.log("sorry,"+ urlArr[1] +" action cannot be completed");
+            
     }
     
     
